@@ -1,4 +1,3 @@
-
 import Game from './Game.js';
 import TaskQueue from './TaskQueue.js';
 import SpeedRate from './SpeedRate.js';
@@ -73,7 +72,7 @@ class Trasher extends Dog {
     }
 }
 
-class Gatling extends Creature{
+class Gatling extends Creature {
     constructor(name = 'Гатлинг', maxPower = 6, image) {
         super(name, maxPower, image);
     }
@@ -98,16 +97,63 @@ class Gatling extends Creature{
 }
 
 
+class Lad extends Dog {
+    constructor(name = 'Браток', maxPower = 2, image) {
+        super(name, maxPower, image);
+    }
+
+    static getInGameCount() {
+        return this.inGameCount || 0;
+    }
+
+    static setInGameCount(value) {
+        this.inGameCount = value;
+    }
+
+    static getBonus() {
+        const count = this.getInGameCount();
+        return count * (count + 1) / 2;
+    }
+
+    doAfterComingIntoPlay(gameContext, continuation) {
+        Lad.setInGameCount(Lad.getInGameCount() + 1);
+        super.doAfterComingIntoPlay(gameContext, continuation);
+    }
+
+    doBeforeRemoving(continuation) {
+        Lad.setInGameCount(Lad.getInGameCount() - 1);
+        super.doBeforeRemoving(continuation);
+    }
+
+    modifyDealedDamageToCreature(value, toCard, gameContext, continuation) {
+        const bonus = Lad.getBonus();
+        continuation(value + bonus);
+    }
+
+    modifyTakenDamage(value, fromCard, gameContext, continuation) {
+        const bonus = Lad.getBonus();
+        continuation(Math.max(value - bonus, 0));
+    }
+
+    getDescriptions() {
+        const descriptions = [];
+        if (Lad.prototype.hasOwnProperty('modifyDealedDamageToCreature') || Lad.prototype.hasOwnProperty('modifyTakenDamage')) {
+            descriptions.push('Чем их больше, тем они сильнее');
+        }
+        return [...descriptions, ...super.getDescriptions()];
+    }
+}
+
+
 // Колода Шерифа, нижнего игрока.
 const seriffStartDeck = [
     new Duck(),
     new Duck(),
-    new Gatling(),
+    new Duck(),
 ];
 const banditStartDeck = [
-    new Trasher(),
-    new Dog(),
-    new Dog(),
+    new Lad(),
+    new Lad(),
 ];
 
 // Создание игры.
