@@ -1,6 +1,7 @@
 import {default as View} from './CardView.js';
 import TaskQueue from './TaskQueue.js';
 
+
 const Card = function () {
     function Card(name, maxPower, image) {
         this.name = name;
@@ -244,5 +245,6 @@ const Card = function () {
 
     return Card;
 }();
+
 
 export default Card;
